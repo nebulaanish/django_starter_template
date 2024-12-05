@@ -6,3 +6,4 @@ psycopg2-binary
 drf-spectacular
 drf_spectacular_sidecar
 celery[redis]
+gunicorn

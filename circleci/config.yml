@@ -1,0 +1,48 @@
+version: 2.1
+
+jobs:
+  build_and_push_on_main:
+    docker:
+      - image: kopilb/aws-docker:v0.1.0
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.16
+          docker_layer_caching: true
+      - run:
+          name: Build Docker Image and Push to DockerHub
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+            docker-compose -f docker-compose.dev.yml build
+            docker-compose -f docker-compose.dev.yml push
+
+  deploy_to_server_on_main:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run:
+          name: Deploy to Server via SSH
+          command: |
+            echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'Connected to the server'"
+            scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
+            echo "$ENV_DEV" | base64 -d >> /root/project/.env
+            sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml pull"
+            sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml up --no-build --force-recreate -d"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build_and_push_on_main:
+          filters:
+            branches:
+              only:
+                - main
+      - deploy_to_server_on_main:
+          requires:
+            - build_and_push_on_main
+          filters:
+            branches:
+              only:
+                - main
