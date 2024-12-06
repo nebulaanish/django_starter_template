@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: 216989129562.dkr.ecr.ap-south-1.amazonaws.com/inc-be:dev
+    image: nebularamailo77/django_starter_template:dev
     container_name: inc-be-dev
     ports:
       - "8041:8041"
