@@ -32,8 +32,8 @@ jobs:
             
             sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "
               cd /home/$SERVER_USER/testing
-              docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml pull
-              docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml up --no-build --force-recreate -d
+              docker compose -f ./docker-compose.dev.yml pull
+              docker compose -f ./docker-compose.dev.yml up --no-build --force-recreate -d
             "
 
 
