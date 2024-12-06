@@ -25,7 +25,7 @@ jobs:
           name: Deploy Files and Start Services
           command: |
             sudo apt update && sudo apt install sshpass -y
-            sshpass -p "$SERVER_PASSWORD" echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+            sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
             echo "$ENV_DEV" | base64 -d >> ./.env
           
             sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env

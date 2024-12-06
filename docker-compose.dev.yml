@@ -2,12 +2,12 @@ version: '3'
 
 services:
   # Service to run the backend API using Gunicorn
-  inc-api:
+  test-django:
     build:
       context: .
       dockerfile: Dockerfile.dev
     image: nebularamailo77/django_starter_template:dev
-    container_name: inc-be-dev
+    container_name: test-django
     ports:
       - "8041:8041"
     env_file:
