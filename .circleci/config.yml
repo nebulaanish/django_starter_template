@@ -23,17 +23,17 @@ jobs:
       - checkout
       - run:
           name: Deploy Files and Start Services
-          command: |
-          echo "$SERVER_PASSWORD" | docker login  --username $DOCKER_USERNAME --password-stdin
-          sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml          
-          echo "$ENV_DEV" | base64 -d > ./.env
-          sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
-          
-          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "
-            cd /home/$SERVER_USER/testing
-            docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml pull
-            docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml up --no-build --force-recreate -d
-          "
+          command: | 
+            sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml          
+            echo "$SERVER_PASSWORD" | docker login  --username $DOCKER_USERNAME --password-stdin
+            echo "$ENV_DEV" | base64 -d > ./.env
+            sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
+            
+            sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "
+              cd /home/$SERVER_USER/testing
+              docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml pull
+              docker compose -f ./docker-compose.${CIRCLE_BRANCH}.yml up --no-build --force-recreate -d
+            "
 
 
 
