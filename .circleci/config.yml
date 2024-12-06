@@ -28,11 +28,11 @@ jobs:
       - run:
           name: Test SSH Connection
           command: |
+            echo "$ENV_DEV" | base64 -d >> ./.env
             echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'SSH connection successful'"
       - run:
           name: Deploy Files and Start Services
           command: |
-            # Copy the docker-compose file to the server
             sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
             
             # Confirm the file was copied
