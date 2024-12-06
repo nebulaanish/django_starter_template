@@ -27,6 +27,8 @@ jobs:
             sudo apt update && sudo apt install sshpass -y
             sshpass -p "$SERVER_PASSWORD" echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
             echo "$ENV_DEV" | base64 -d >> ./.env
+          
+            sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
             sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
             sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml pull"
             sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml up -d"
