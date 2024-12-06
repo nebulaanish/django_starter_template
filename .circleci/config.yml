@@ -24,8 +24,10 @@ jobs:
       - run:
           name: Deploy Files and Start Services
           command: |
+            scp ./docker-compose.dev.yml $SSH_DEV_USER@$SSH_DEV_HOST:/home/$SSH_DEV_USER/testing/docker-compose.dev.yml
             sudo apt update && sudo apt install sshpass -y
             echo "$ENV_DEV" | base64 -d >> ./.env
+            scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
             echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'SSH connection successful'"
             sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
             
@@ -34,10 +36,9 @@ jobs:
             
             # Pull and start the Docker containers
             sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "
-              scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
               cd /home/$SERVER_USER/testing
-              docker compose -f docker-compose.dev.yml pull && 
-              docker compose -f docker-compose.dev.yml up --no-build --force-recreate -d
+              docker compose -f ./docker-compose.dev.yml pull && 
+              docker compose -f ./docker-compose.dev.yml up --no-build --force-recreate -d
             "
 
 workflows:
