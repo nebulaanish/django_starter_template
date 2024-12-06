@@ -24,9 +24,9 @@ jobs:
       - run:
           name: Deploy Files and Start Services
           command: |
-            sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
             sudo apt update && sudo apt install sshpass -y
             echo "$ENV_DEV" | base64 -d >> ./.env
+            sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
             scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
             echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'SSH connection successful'"
             sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
