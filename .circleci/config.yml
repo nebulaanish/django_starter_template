@@ -16,22 +16,28 @@ jobs:
             docker compose -f docker-compose.dev.yml push
             docker logout
 
-  deploy_to_server_on_main:
-    machine:
-      enabled: true
-    steps:
-      - checkout
-      - run:
-          name: Deploy Files and Start Services
-          command: |
-            sudo apt update && sudo apt install sshpass -y
-            sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-            echo "$ENV_DEV" | base64 -d >> ./.env
+deploy_to_server_on_main:
+  machine:
+    enabled: true
+  steps:
+    - checkout
+    - run:
+        name: Deploy Files and Start Services
+        command: |
+          sudo apt update && sudo apt install sshpass -y
           
-            sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
-            sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
-            sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml pull"
-            sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml up -d"
+          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP \
+          "echo '$DOCKER_PASSWORD' | docker login --username '$DOCKER_USERNAME' --password-stdin || exit 1"
+
+          sshpass -p "$SERVER_PASSWORD" scp ./.env $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/.env
+          sshpass -p "$SERVER_PASSWORD" scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
+
+          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP \
+          "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml pull || exit 1"
+
+          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_HOST_IP \
+          "cd /home/$SERVER_USER/testing && docker-compose -f docker-compose.dev.yml up -d || exit 1"
+
 
 
 workflows:
