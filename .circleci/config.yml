@@ -27,6 +27,7 @@ jobs:
             sudo apt install sshpass -y
             echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'Connected to the server'"
             scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
+            echo ls -l /home/$SERVER_USER/testing
             sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml pull"
             sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml up --no-build --force-recreate -d"
 
