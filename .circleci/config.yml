@@ -12,6 +12,7 @@ jobs:
           name: Build Docker Image and Push to DockerHub
           command: |
             echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+            echo "$ENV_DEV" | base64 -d >> /root/project/.env
             docker compose -f docker-compose.dev.yml build
             docker compose -f docker-compose.dev.yml push
 
@@ -25,7 +26,6 @@ jobs:
           command: |
             echo "$SERVER_PASSWORD" | sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "echo 'Connected to the server'"
             scp ./docker-compose.dev.yml $SERVER_USER@$SERVER_HOST_IP:/home/$SERVER_USER/testing/docker-compose.dev.yml
-            echo "$ENV_DEV" | base64 -d >> /root/project/.env
             sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml pull"
             sshpass ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST_IP "docker compose -f /home/$SERVER_USER/testing/docker-compose.dev.yml up --no-build --force-recreate -d"
 
